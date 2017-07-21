@@ -41,9 +41,18 @@ public class SimpleVideoStream extends Activity implements
 
 		Bundle b = getIntent().getExtras();
 		mVideoUrl = b.getString("mediaUrl");
-		mShouldAutoClose = b.getBoolean("shouldAutoClose");
-		mShouldAutoClose = mShouldAutoClose == null ? true : mShouldAutoClose;
-		mControls = b.getBoolean("controls", true);
+
+        if (b.containsKey("shouldAutoClose")) {
+			mShouldAutoClose = b.getBoolean("shouldAutoClose");
+		} else {
+			mShouldAutoClose = true;
+		}
+
+		if (b.containsKey("controls")) {
+			mControls = b.getBoolean("controls");
+		} else {
+			mControls = true;
+		}
 
 		RelativeLayout relLayout = new RelativeLayout(this);
 		relLayout.setBackgroundColor(Color.BLACK);
@@ -64,10 +73,12 @@ public class SimpleVideoStream extends Activity implements
 		relLayout.addView(mProgressBar);
 		mProgressBar.bringToFront();
 
-		setOrientation(b.getString("orientation"));
-
+		if (b.containsKey("orientation")) {
+			setOrientation(b.getString("orientation"));
+		} else {
+			setOrientation(b.getString("landscape"));
+		}
 		setContentView(relLayout, relLayoutParam);
-
 		play();
 	}
 
@@ -148,8 +159,8 @@ public class SimpleVideoStream extends Activity implements
 	}
 
 	public void onCompletion(MediaPlayer mp) {
-		stop();
 		if (mShouldAutoClose) {
+			stop();
 			wrapItUp(RESULT_OK, null);
 		}
 	}
